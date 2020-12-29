@@ -1,0 +1,42 @@
+# Configuration for Release Drafter: https://github.com/release-drafter/release-drafter
+name-template: $NEXT_PATCH_VERSION
+tag-template: $NEXT_PATCH_VERSION
+
+# Emoji reference: https://gitmoji.dev/
+categories:
+  - title: 💥 Breaking changes
+    labels:
+      - breaking
+  - title: 🚨 Removed
+    labels:
+      - removed
+  - title: 🗑 Deprecated
+    labels:
+      - deprecated
+  - title: ✨ New features and improvements
+    labels:
+      - enhancement
+  - title: 🐛 Bug Fixes
+    labels:
+      - bug
+  # Default label used by Dependabot
+  - title: 📦 Dependency updates
+    labels:
+      - dependencies
+  - title: 📝 Documentation updates
+    labels:
+      - documentation
+  - title: 👻 Maintenance
+    labels:
+      - chore
+  - title: 🚦 Tests
+    labels:
+      - tests
+exclude-labels:
+  - reverted
+  - skip-changelog
+  - invalid
+
+template: |
+  <!-- Optional: add a release summary here -->
+  $CHANGES
