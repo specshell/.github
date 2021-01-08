@@ -1,0 +1,39 @@
+name: labels
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/labels.yml'
+      - '.github/workflows/labels.yml'
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    outputs:
+      token: ${{ steps.generate_token.outputs.token }}
+    steps:
+      - name: Run Labeler
+        uses: jetersen/ghaction-github-labeler@fix/loadConfigGitHubApi
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.SPECSHELL_PUSH_APP_ID }}
+          private_key: ${{ secrets.SPECSHELL_PUSH_APP_PEM }}
+
+  dispatch:
+    needs:
+    - labeler
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ['Specshell/specshell.software.maven.pom']
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ needs.labeler.outputs.token }}
+          repository: ${{ matrix.repo }}
+          event-type: labels-update
