@@ -21,7 +21,7 @@
   description: "Improvements or additions to documentation"
 - name: "chore"
   color: "58FBC8"
-  description: "Janitor work 🚮"
+  description: "Janitor work"
 - name: "tests"
   color: "BEC9FA"
   description: "A PR that adds to testing"
