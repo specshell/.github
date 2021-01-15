@@ -1,6 +1,6 @@
 # Configuration for Release Drafter: https://github.com/release-drafter/release-drafter
-name-template: 'v$RESOLVED_VERSION'
-tag-template: 'v$RESOLVED_VERSION'
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
 
 # Emoji reference: https://gitmoji.dev/
 categories:
@@ -34,7 +34,7 @@ categories:
       - tests
 exclude-labels:
   - reverted
-  - skip-changelog
+  - skip-release
   - invalid
 
 template: |
@@ -44,10 +44,10 @@ template: |
 version-resolver:
   major:
     labels:
-      - 'major'
+      - major
   minor:
     labels:
-      - 'minor'
+      - minor
   patch:
     labels:
-      - 'patch'
+      - patch
