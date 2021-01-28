@@ -51,3 +51,7 @@ version-resolver:
   patch:
     labels:
       - patch
+
+replacers:
+  - search: '@renovate'
+    replace: '@renovatebot'
