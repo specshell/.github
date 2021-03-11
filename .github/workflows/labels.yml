@@ -14,17 +14,8 @@ jobs:
     steps:
       - name: Run Labeler
         uses: jetersen/ghaction-github-labeler@fix/loadConfigGitHubApi
-
-  dispatch:
-    needs:
-    - labeler
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repo: ['Specshell/specshell.software.maven.pom']
-    steps:
       - name: Generate token
-        id: generate_token
+        id: gentoken
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.SPECSHELL_PUSH_APP_ID }}
@@ -32,6 +23,6 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ steps.generate_token.outputs.token }}
-          repository: ${{ matrix.repo }}
+          token: ${{ steps.gentoken.outputs.token }}
+          repository: Specshell/specshell.github.workflows
           event-type: labels-update

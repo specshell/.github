@@ -69,3 +69,6 @@ labels:
   - name: "wontfix"
     color: "ffffff"
     description: "This will not be worked on"
+  - name: ".NET"
+    color: "7121c6"
+    description: "Pull requests that update .net code"
