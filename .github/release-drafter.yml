@@ -44,9 +44,11 @@ template: |
 version-resolver:
   major:
     labels:
+      - breaking
       - major
   minor:
     labels:
+      - enhancement
       - minor
   patch:
     labels:
