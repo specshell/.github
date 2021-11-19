@@ -1,0 +1,74 @@
+name: Docker build and push
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      image_title:
+        required: true
+        type: string
+      image_description:
+        required: true
+        type: string
+    secrets:
+      NEXUS_USER:
+        required: true
+      NEXUS_PASSWORD:
+        required: true
+
+jobs:
+  build:
+    if: ${{ github.event_name == 'push' && github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}
+          tag-sha: true
+          tag-semver: |
+            {{version}}
+            {{major}}.{{minor}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+          build-args: |
+            "NEXUS_USER=${{ secrets.NEXUS_USER }}"
+            "NEXUS_PASSWORD=${{ secrets.NEXUS_PASSWORD }}"
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: |
+            ${{ steps.docker_meta.outputs.labels }}
+            org.opencontainers.image.title=${{ inputs.image_title }}
+            org.opencontainers.image.description=${{ inputs.image_description }}
+            org.opencontainers.image.vendor=Specshell
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
