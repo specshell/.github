@@ -12,10 +12,14 @@ on:
       image_description:
         required: true
         type: string
+      image_context:
+        default: '.'
+        required: false
+        type: string
     secrets:
-      NEXUS_USER:
+      package_user:
         required: true
-      NEXUS_PASSWORD:
+      package_password:
         required: true
 
 jobs:
@@ -48,10 +52,14 @@ jobs:
 
       - name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v3.6.0
+        uses: docker/metadata-action@v3.6.0
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}
+          labels: |
+            org.opencontainers.image.title=${{ inputs.image_title }}
+            org.opencontainers.image.description=${{ inputs.image_description }}
+            org.opencontainers.image.vendor=Specshell
           tags: |
             type=schedule
             type=semver,pattern={{version}}
@@ -66,13 +74,10 @@ jobs:
         with:
           push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
           build-args: |
-            "NEXUS_USER=${{ secrets.NEXUS_USER }}"
-            "NEXUS_PASSWORD=${{ secrets.NEXUS_PASSWORD }}"
+            "PACKAGE_USER=${{ secrets.package_user }}"
+            "PACKAGE_PASSWORD=${{ secrets.package_password }}"
           tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: |
-            ${{ steps.docker_meta.outputs.labels }}
-            org.opencontainers.image.title=${{ inputs.image_title }}
-            org.opencontainers.image.description=${{ inputs.image_description }}
-            org.opencontainers.image.vendor=Specshell
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          conetext: ${{ inputs.image_context }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
