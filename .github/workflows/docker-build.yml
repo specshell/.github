@@ -52,10 +52,14 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}
-          tag-sha: true
-          tag-semver: |
-            {{version}}
-            {{major}}.{{minor}}
+          tags: |
+            type=schedule
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
 
       - name: Build and push
         uses: docker/build-push-action@v2
