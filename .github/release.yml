@@ -1,0 +1,42 @@
+changelog:
+  exclude:
+    labels:
+        - reverted
+        - skip-release
+        - invalid
+    authors:
+      - octocat
+  categories:
+    - title: 💥 Breaking changes
+      labels:
+        - breaking
+        - major
+    - title: 🚨 Removed
+      labels:
+        - removed
+    - title: 🗑 Deprecated
+      labels:
+        - deprecated
+    - title: ✨ New features and improvements
+      labels:
+        - enhancement
+        - minor
+    - title: 🐛 Bug Fixes
+      labels:
+        - bug
+    # Default label used by Dependabot
+    - title: 📦 Dependency updates
+      labels:
+        - dependencies
+    - title: 📝 Documentation updates
+      labels:
+        - documentation
+    - title: 👻 Maintenance
+      labels:
+        - chore
+    - title: 🚦 Tests
+      labels:
+        - tests
+    - title: Other Changes
+      labels:
+        - "*"
