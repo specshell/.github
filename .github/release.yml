@@ -1,9 +1,9 @@
 changelog:
   exclude:
     labels:
-        - reverted
-        - skip-release
-        - invalid
+      - reverted
+      - skip-release
+      - invalid
     authors:
       - octocat
   categories:
