@@ -118,13 +118,13 @@ jobs:
         id: check-for-nuget-packages
         run: |
           if ($IsWindows) {
-            $nugetPackages = "${{ env.GITHUB_WORKSPACE }}\output\nuget\*.nupkg"
+            $nugetPackages = "$ENV:GITHUB_WORKSPACE\output\nuget\*.nupkg"
           } else {
-            $nugetPackages = "${{ env.GITHUB_WORKSPACE }}/output/nuget/*.nupkg"
+            $nugetPackages = "$ENV:GITHUB_WORKSPACE/output/nuget/*.nupkg"
           }
           if (Test-Path $nugetPackages) {
             echo "::set-output name=nuget-package::true"
-            echo "NuGet packages detected"
+            echo "NuGet packages detected: $nugetPackages"
           } else {
             echo "::set-output name=nuget-package::false"
             echo "No NuGet packages detected"
@@ -135,13 +135,13 @@ jobs:
         id: check-for-chocolatey-packages
         run: |
           if ($IsWindows) {
-            $chocolateyPackages = "${{ env.GITHUB_WORKSPACE }}\output\chocolatey\*.nupkg"
+            $chocolateyPackages = "$ENV:GITHUB_WORKSPACE\output\chocolatey\*.nupkg"
           } else {
-            $chocolateyPackages = "${{ env.GITHUB_WORKSPACE }}/output/chocolatey/*.nupkg"
+            $chocolateyPackages = "$ENV:GITHUB_WORKSPACE/output/chocolatey/*.nupkg"
           }
           if (Test-Path $chocolateyPackages) {
             echo "::set-output name=chocolatey-package::true"
-            echo "Chocolatey packages detected"
+            echo "Chocolatey packages detected: $chocolateyPackages"
           } else {
             echo "::set-output name=chocolatey-package::false"
             echo "No Chocolatey packages detected"
