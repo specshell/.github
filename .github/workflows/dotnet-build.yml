@@ -95,7 +95,7 @@ jobs:
         run: dotnet pack --configuration Release --no-build --no-restore --output "${{ env.GITHUB_WORKSPACE }}/output"
 
       - name: Test
-        timeout-minutes: ${{ inputs.test-timeout }}
+        timeout-minutes: 10
         run: |
           if (Test-Path './coverlet.runsettings') {
             dotnet test -c Release --collect:"XPLat Code Coverage" --settings coverlet.runsettings --results-directory "coverage" --verbosity normal --no-build --no-restore
