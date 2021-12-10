@@ -124,8 +124,10 @@ jobs:
           }
           if (Test-Path $nugetPackages) {
             echo "::set-output name=nuget-package::true"
+            echo "NuGet packages detected"
           } else {
             echo "::set-output name=nuget-package::false"
+            echo "No NuGet packages detected"
           }
           echo "::set-output name=nuget-package-path::$nugetPackages"
 
@@ -139,8 +141,10 @@ jobs:
           }
           if (Test-Path $chocolateyPackages) {
             echo "::set-output name=chocolatey-package::true"
+            echo "Chocolatey packages detected"
           } else {
             echo "::set-output name=chocolatey-package::false"
+            echo "No Chocolatey packages detected"
           }
           echo "::set-output name=chocolatey-package-path::$chocolateyPackages"
 
