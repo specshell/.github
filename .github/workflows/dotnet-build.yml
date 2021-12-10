@@ -37,7 +37,7 @@ on:
         required: false
       push_chocolatey_feed:
         required: false
-      push_choco_api_key:
+      push_cchocolatey_api_key:
         required: false
       codecov_token:
         required: false
@@ -153,7 +153,7 @@ jobs:
 
       - name: Push Chocolatey packages
         env:
-          CHOCOLATEY_API_KEY: ${{ secrets.push_choco_api_key }}
+          CHOCOLATEY_API_KEY: ${{ secrets.push_chocolatey_api_key }}
         if: ${{ inputs.push-chocolatey && steps.check-for-chocolatey-packages.outputs.chocolatey-package && env.CHOCOLATEY_API_KEY != '' }}
         run: |
           dotnet nuget push "${{ steps.check-for-chocolatey-packages.outputs.chocolatey-package-path }}" --source "${{ secrets.push_chocolatey_feed }}" --api-key '${{ env.CHOCOLATEY_API_KEY }}' --skip-duplicate
