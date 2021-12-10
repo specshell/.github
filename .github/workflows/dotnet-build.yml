@@ -51,7 +51,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
-    runs-on: ${{ input.runs-on }}
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
       - uses: actions/checkout@v2
@@ -79,7 +79,7 @@ jobs:
           dotnet nuget remove source nugetfeed
 
       - name: Decode certificate
-        if: ${{ input.code-sign }}
+        if: ${{ inputs.code-sign }}
         run: |
           [System.IO.File]::WriteAllBytes("./cert.pfx", [System.Convert]::FromBase64String("${{ secrets.code_sign_pfx }}"))
 
@@ -95,7 +95,7 @@ jobs:
         run: dotnet pack --configuration Release --no-build --no-restore --output "${{ env.GITHUB_WORKSPACE }}/output"
 
       - name: Test
-        timeout-minutes: ${{ input.test-timeout }}
+        timeout-minutes: ${{ inputs.test-timeout }}
         run: |
           if (Test-Path './coverlet.runsettings') {
             dotnet test -c Release --collect:"XPLat Code Coverage" --settings coverlet.runsettings --results-directory "coverage" --verbosity normal --no-build --no-restore
@@ -147,13 +147,13 @@ jobs:
       - name: Push NuGet packages
         env:
           NUGET_API_KEY: ${{ secrets.push_nuget_api_key }}
-        if: ${{ input.push-nuget && steps.check-for-nuget-packages.outputs.nuget-package && env.NUGET_API_KEY != '' }}
+        if: ${{ inputs.push-nuget && steps.check-for-nuget-packages.outputs.nuget-package && env.NUGET_API_KEY != '' }}
         run: |
           dotnet nuget push "${{ steps.check-for-nuget-packages.outputs.nuget-package-path }}" --source "${{ secrets.push_nuget_feed }}" --api-key '${{ env.NUGET_API_KEY }}' --skip-duplicate
 
       - name: Push Chocolatey packages
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.push_choco_api_key }}
-        if: ${{ input.push-chocolatey && steps.check-for-chocolatey-packages.outputs.chocolatey-package && env.CHOCOLATEY_API_KEY != '' }}
+        if: ${{ inputs.push-chocolatey && steps.check-for-chocolatey-packages.outputs.chocolatey-package && env.CHOCOLATEY_API_KEY != '' }}
         run: |
           dotnet nuget push "${{ steps.check-for-chocolatey-packages.outputs.chocolatey-package-path }}" --source "${{ secrets.push_chocolatey_feed }}" --api-key '${{ env.CHOCOLATEY_API_KEY }}' --skip-duplicate
