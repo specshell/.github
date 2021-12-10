@@ -37,7 +37,7 @@ on:
         required: false
       push_chocolatey_feed:
         required: false
-      push_cchocolatey_api_key:
+      push_chocolatey_api_key:
         required: false
       codecov_token:
         required: false
