@@ -20,6 +20,10 @@ on:
         required: false
         type: boolean
         default: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+      code-sign:
+        required: false
+        type: boolean
+        default: true
     secrets:
       package_user:
         required: true
@@ -36,6 +40,10 @@ on:
       push_choco_api_key:
         required: false
       codecov_token:
+        required: false
+      code_sign_password:
+        required: false
+      code_sign_pfx:
         required: false
 
 jobs:
@@ -70,10 +78,17 @@ jobs:
           dotnet restore
           dotnet nuget remove source nugetfeed
 
+      - name: Decode certificate
+        if: ${{ input.code-sign }}
+        run: |
+          [System.IO.File]::WriteAllBytes("./cert.pfx", [System.Convert]::FromBase64String("${{ secrets.code_sign_pfx }}"))
+
       - name: Build Debug
         run: dotnet build -c Debug --no-restore
 
       - name: Build Release
+        env:
+          CERT_PASSWORD: "${{ secrets.code_sign_password }}"
         run: dotnet build -c Release --no-restore
 
       - name: Pack
