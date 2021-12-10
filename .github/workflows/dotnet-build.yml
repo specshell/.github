@@ -118,16 +118,16 @@ jobs:
         id: check-for-chocolatey-packages
         run: |
           if ($IsWindows) {
-            $chocoPackages = "${{ env.GITHUB_WORKSPACE }}\output\chocolatey\*.nupkg"
+            $chocolateyPackages = "${{ env.GITHUB_WORKSPACE }}\output\chocolatey\*.nupkg"
           } else {
-            $chocoPackages = "${{ env.GITHUB_WORKSPACE }}/output/chocolatey/*.nupkg"
+            $chocolateyPackages = "${{ env.GITHUB_WORKSPACE }}/output/chocolatey/*.nupkg"
           }
-          if (Test-Path $chocoPackages) {
+          if (Test-Path $chocolateyPackages) {
             echo "::set-output name=chocolatey-package::true"
           } else {
             echo "::set-output name=chocolatey-package::false"
           }
-          echo "::set-output name=chocolatey-package-path::$chocoPackages"
+          echo "::set-output name=chocolatey-package-path::$chocolateyPackages"
 
       - name: Push NuGet packages
         env:
@@ -138,7 +138,7 @@ jobs:
 
       - name: Push Chocolatey packages
         env:
-          CHOCO_API_KEY: ${{ secrets.push_choco_api_key }}
-        if: ${{ input.push-chocolatey && steps.check-for-chocolatey-packages.outputs.chocolatey-package && env.CHOCO_API_KEY != '' }}
+          CHOCOLATEY_API_KEY: ${{ secrets.push_choco_api_key }}
+        if: ${{ input.push-chocolatey && steps.check-for-chocolatey-packages.outputs.chocolatey-package && env.CHOCOLATEY_API_KEY != '' }}
         run: |
-          dotnet nuget push "${{ steps.check-for-chocolatey-packages.outputs.chocolatey-package-path }}" --source "${{ secrets.push_chocolatey_feed }}" --api-key '${{ env.CHOCO_API_KEY }}' --skip-duplicate
+          dotnet nuget push "${{ steps.check-for-chocolatey-packages.outputs.chocolatey-package-path }}" --source "${{ secrets.push_chocolatey_feed }}" --api-key '${{ env.CHOCOLATEY_API_KEY }}' --skip-duplicate
