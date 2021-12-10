@@ -21,6 +21,8 @@ on:
         required: true
       package_password:
         required: true
+      package_feed:
+        required: false
 
 jobs:
   build:
@@ -74,6 +76,7 @@ jobs:
         with:
           push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
           build-args: |
+            "PACKAGE_FEED=${{ secrets.package_feed }}"
             "PACKAGE_USER=${{ secrets.package_user }}"
             "PACKAGE_PASSWORD=${{ secrets.package_password }}"
           tags: ${{ steps.docker_meta.outputs.tags }}
