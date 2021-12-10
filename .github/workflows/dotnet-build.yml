@@ -1,0 +1,140 @@
+# This workflow is used to build and push NuGet Packages and Chocolatey Packages
+name: DotNet build and push
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        required: false
+        type: string
+        default: ubuntu-latest
+      test-timeout:
+        required: false
+        type: number
+        default: 10
+      push-nuget:
+        required: false
+        type: boolean
+        default: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+    secrets:
+      package_user:
+        required: true
+      package_password:
+        required: true
+      package_nuget_feed:
+        required: true
+      push_nuget_feed:
+        required: false
+      push_nuget_api_key:
+        required: false
+      push_choco_feed:
+        required: false
+      push_choco_api_key:
+        required: false
+      codecov_token:
+        required: false
+
+jobs:
+  build:
+    defaults:
+      run:
+        shell: pwsh
+    runs-on: ${{ input.runs-on }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.nuget/packages
+            .dotnet/tools
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: |
+          dotnet nuget add source "${{ secrets.package_nuget_feed }}" -n nugetfeed -u '${{ secrets.package_user }}' -p '${{ secrets.package_password }}' --store-password-in-clear-text
+          dotnet restore
+          dotnet nuget remove source nugetfeed
+
+      - name: Build Debug
+        run: dotnet build -c Debug --no-restore
+
+      - name: Build Release
+        run: dotnet build -c Release --no-restore
+
+      - name: Pack
+        run: dotnet pack --configuration Release --no-build --no-restore --output "${{ env.GITHUB_WORKSPACE }}/output"
+
+      - name: Test
+        timeout-minutes: ${{ input.test-timeout }}
+        run: |
+          if (Test-Path './coverlet.runsettings') {
+            dotnet test -c Release --collect:"XPLat Code Coverage" --settings coverlet.runsettings --results-directory "coverage" --verbosity normal --no-build --no-restore
+          }
+          else {
+            dotnet test -c Release --collect:"XPLat Code Coverage" --results-directory "coverage" --verbosity normal --no-build --no-restore
+          }
+
+      - name: Upload coverage reports
+        if: ${{ always() }}
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.codecov_token }}
+          directory: ./coverage
+          name: codecov-specshell
+          fail_ci_if_error: false
+          verbose: false
+
+      - name: Check for NuGet packages
+        id: check-for-nuget-packages
+        run: |
+          if ($IsWindows) {
+            $nugetPackages = "${{ env.GITHUB_WORKSPACE }}\output\nuget\*.nupkg"
+          } else {
+            $nugetPackages = "${{ env.GITHUB_WORKSPACE }}/output/nuget/*.nupkg"
+          }
+          if (Test-Path $nugetPackages) {
+            echo "::set-output name=nuget-package::true"
+          } else {
+            echo "::set-output name=nuget-package::false"
+          }
+          echo "::set-output name=nuget-package-path::$nugetPackages"
+
+      - name: Check for Choco Packages
+        id: check-for-choco-packages
+        run: |
+          if ($IsWindows) {
+            $chocoPackages = "${{ env.GITHUB_WORKSPACE }}\output\choco\*.nupkg"
+          } else {
+            $chocoPackages = "${{ env.GITHUB_WORKSPACE }}/output/choco/*.nupkg"
+          }
+          if (Test-Path $chocoPackages) {
+            echo "::set-output name=choco-package::true"
+          } else {
+            echo "::set-output name=choco-package::false"
+          }
+          echo "::set-output name=choco-package-path::$chocoPackages"
+
+      - name: Push NuGet packages
+        env:
+          NUGET_API_KEY: ${{ secrets.push_nuget_api_key }}
+        if: ${{ input.push-nuget && steps.check-for-nuget-packages.outputs.nuget-package && env.NUGET_API_KEY != '' }}
+        run: |
+          dotnet nuget push "${{ steps.check-for-nuget-packages.outputs.nuget-package-path }}" --source "${{ secrets.push_nuget_feed }}" --api-key '${{ env.NUGET_API_KEY }}' --skip-duplicate
+
+      - name: Push Chocolatey packages
+        env:
+          CHOCO_API_KEY: ${{ secrets.push_choco_api_key }}
+        if: ${{ input.push-chocolatey && steps.check-for-choco-packages.outputs.choco-package && env.CHOCO_API_KEY != '' }}
+        run: |
+          dotnet nuget push "${{ steps.check-for-choco-packages.outputs.choco-package-path }}" --source "${{ secrets.push_chocolatey_feed }}" --api-key '${{ env.CHOCO_API_KEY }}' --skip-duplicate
