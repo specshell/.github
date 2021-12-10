@@ -92,7 +92,7 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Pack
-        run: dotnet pack --configuration Release --no-build --no-restore --output "${{ env.GITHUB_WORKSPACE }}/output"
+        run: dotnet pack --configuration Release --no-build --no-restore
 
       - name: Test
         timeout-minutes: 10
