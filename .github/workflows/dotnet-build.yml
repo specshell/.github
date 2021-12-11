@@ -84,6 +84,10 @@ jobs:
         if: ${{ inputs.code-sign }}
         run: |
           [System.IO.File]::WriteAllBytes("./cert.pfx", [System.Convert]::FromBase64String("${{ secrets.code_sign_pfx }}"))
+          if ($IsLinux) {
+            echo "Installing osslsigncode"
+            sudo apt-get install -qq -y osslsigncode
+          }
 
       - name: Build Debug
         run: dotnet build -c Debug --no-restore
