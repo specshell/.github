@@ -80,8 +80,10 @@ jobs:
           dotnet restore
           dotnet nuget remove source nugetfeed
 
-      - name: Decode certificate
-        if: ${{ inputs.code-sign }}
+      - name: Setup certificate
+        if: |
+          inputs.code-sign &&
+          (inputs.push-nuget || inputs.push-chocolatey)
         run: |
           [System.IO.File]::WriteAllBytes("./cert.pfx", [System.Convert]::FromBase64String("${{ secrets.code_sign_pfx }}"))
           if ($IsLinux) {
@@ -111,7 +113,7 @@ jobs:
           }
 
       - name: Upload coverage reports
-        if: ${{ always() }}
+        if: always()
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.codecov_token }}
@@ -157,13 +159,26 @@ jobs:
       - name: Push NuGet packages
         env:
           NUGET_API_KEY: ${{ secrets.push_nuget_api_key }}
-        if: ${{ inputs.push-nuget && steps.check-for-nuget-packages.outputs.nuget-package && env.NUGET_API_KEY != '' }}
+        if: |
+          inputs.push-nuget &&
+          steps.check-for-nuget-packages.outputs.nuget-package &&
+          env.NUGET_API_KEY != ''
         run: |
           dotnet nuget push "${{ steps.check-for-nuget-packages.outputs.nuget-package-path }}" --source "${{ secrets.push_nuget_feed }}" --api-key '${{ env.NUGET_API_KEY }}' --skip-duplicate
 
       - name: Push Chocolatey packages
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.push_chocolatey_api_key }}
-        if: ${{ inputs.push-chocolatey && steps.check-for-chocolatey-packages.outputs.chocolatey-package && env.CHOCOLATEY_API_KEY != '' }}
+        if: |
+          inputs.push-chocolatey &&
+          steps.check-for-chocolatey-packages.outputs.chocolatey-package &&
+          env.CHOCOLATEY_API_KEY != ''
         run: |
           dotnet nuget push "${{ steps.check-for-chocolatey-packages.outputs.chocolatey-package-path }}" --source "${{ secrets.push_chocolatey_feed }}" --api-key '${{ env.CHOCOLATEY_API_KEY }}' --skip-duplicate
+
+      - name: Post Setup certificate
+        if: |
+          inputs.code-sign &&
+          (inputs.push-nuget || inputs.push-chocolatey)
+        run: |
+          Remove-Item ./cert.pfx
