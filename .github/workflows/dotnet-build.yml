@@ -104,6 +104,9 @@ jobs:
           CERT_PASSWORD: "${{ secrets.code_sign_password }}"
         run: dotnet build -c Release --no-restore
 
+      - name: publish
+        run: dotnet publish --configuration Release --no-build --no-restore
+
       - name: Pack
         run: dotnet pack --configuration Release --no-build --no-restore
 
