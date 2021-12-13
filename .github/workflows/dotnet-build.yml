@@ -104,13 +104,13 @@ jobs:
           CERT_PASSWORD: "${{ secrets.code_sign_password }}"
         run: dotnet build -c Release --no-restore
 
-      - name: publish
+      - name: Publish Release
         run: dotnet publish --configuration Release --no-build --no-restore
 
-      - name: Pack
+      - name: Pack Release
         run: dotnet pack --configuration Release --no-build --no-restore
 
-      - name: Test
+      - name: Test Release
         timeout-minutes: 10
         run: |
           if (Test-Path './coverlet.runsettings') {
