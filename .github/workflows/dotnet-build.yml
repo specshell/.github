@@ -169,7 +169,7 @@ jobs:
           NUGET_API_KEY: ${{ secrets.push_nuget_api_key }}
         if: |
           inputs.push-nuget &&
-          steps.check-for-nuget-packages.outputs.nuget-package &&
+          steps.check-for-nuget-packages.outputs.nuget-package == 'true' &&
           env.NUGET_API_KEY != ''
         run: |
           dotnet nuget push "${{ steps.check-for-nuget-packages.outputs.nuget-package-path }}" --source "${{ secrets.push_nuget_feed }}" --api-key '${{ env.NUGET_API_KEY }}' --skip-duplicate
@@ -179,7 +179,7 @@ jobs:
           CHOCOLATEY_API_KEY: ${{ secrets.push_chocolatey_api_key }}
         if: |
           inputs.push-chocolatey &&
-          steps.check-for-chocolatey-packages.outputs.chocolatey-package &&
+          steps.check-for-chocolatey-packages.outputs.chocolatey-package == 'true' &&
           env.CHOCOLATEY_API_KEY != ''
         run: |
           dotnet nuget push "${{ steps.check-for-chocolatey-packages.outputs.chocolatey-package-path }}" --source "${{ secrets.push_chocolatey_feed }}" --api-key '${{ env.CHOCOLATEY_API_KEY }}' --skip-duplicate
