@@ -16,6 +16,10 @@ on:
         default: '.'
         required: false
         type: string
+      before_build:
+        default: ''
+        required: false
+        type: string
     secrets:
       package_user:
         required: true
@@ -70,6 +74,11 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha
+
+      - name: Before Build
+        if: ${{ inputs.before_build != "" }}
+        run: |
+          ${{ inputs.before_build }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
