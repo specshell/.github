@@ -76,7 +76,7 @@ jobs:
             type=sha
 
       - name: Before Build
-        if: ${{ inputs.before_build != "" }}
+        if: inputs.before_build != ""
         run: |
           ${{ inputs.before_build }}
 
