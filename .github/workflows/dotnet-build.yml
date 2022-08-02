@@ -27,19 +27,19 @@ on:
       dotnet_publish_command:
         required: false
         type: string
-        default: dotnet publish --configuration Release --no-build --no-restore
+        default: 'dotnet publish --configuration Release --no-build --no-restore'
       dotnet_pack_command:
         required: false
         type: string
-        default: dotnet pack --configuration Release --no-restore
+        default: 'dotnet pack --configuration Release --no-restore'
       dotnet_build_debug_command:
         required: false
         type: string
-        default: dotnet build -c Debug --no-restore
+        default: 'dotnet build -c Debug --no-restore'
       dotnet_build_release_command:
         required: false
         type: string
-        default: dotnet build -c Release --no-restore
+        default: 'dotnet build -c Release --no-restore'
     secrets:
       package_user:
         required: true
