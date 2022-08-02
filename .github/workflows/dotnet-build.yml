@@ -24,6 +24,22 @@ on:
         required: false
         type: boolean
         default: true
+      dotnet_publish_command:
+        required: false
+        type: string
+        default: dotnet publish --configuration Release --no-build --no-restore
+      dotnet_pack_command:
+        required: false
+        type: string
+        default: dotnet pack --configuration Release --no-restore
+      dotnet_build_debug_command:
+        required: false
+        type: string
+        default: dotnet build -c Debug --no-restore
+      dotnet_build_release_command:
+        required: false
+        type: string
+        default: dotnet build -c Release --no-restore
     secrets:
       package_user:
         required: true
@@ -45,23 +61,6 @@ on:
         required: false
       code_sign_pfx:
         required: false
-    parameters:
-      dotnet_publish_command:
-        required: false
-        type: string
-        default: dotnet publish --configuration Release --no-build --no-restore
-      dotnet_pack_command:
-        required: false
-        type: string
-        default: dotnet pack --configuration Release --no-restore
-      dotnet_build_debug_command:
-        required: false
-        type: string
-        default: dotnet build -c Debug --no-restore
-      dotnet_build_release_command:
-        required: false
-        type: string
-        default: dotnet build -c Release --no-restore
 
 jobs:
   build:
@@ -114,18 +113,18 @@ jobs:
           }
 
       - name: Build Debug
-        run:  ${{ parameters.dotnet_build_debug_command }}
+        run:  ${{ inputs.dotnet_build_debug_command }}
 
       - name: Build Release
         env:
           CERT_PASSWORD: "${{ secrets.code_sign_password }}"
-        run: ${{ parameters.dotnet_build_release_command }}
+        run: ${{ inputs.dotnet_build_release_command }}
 
       - name: Publish Release
-        run: ${{ parameters.dotnet_publish_command }}
+        run: ${{ inputs.dotnet_publish_command }}
 
       - name: Pack Release
-        run: ${{ parameters.dotnet_pack_command }}
+        run: ${{ inputs.dotnet_pack_command }}
 
       - name: Test Release
         timeout-minutes: 10
