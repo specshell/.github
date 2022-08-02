@@ -45,6 +45,23 @@ on:
         required: false
       code_sign_pfx:
         required: false
+    parameters:
+      dotnet_publish_command:
+        required: false
+        type: string
+        default: dotnet publish --configuration Release --no-build --no-restore
+      dotnet_pack_command:
+        required: false
+        type: string
+        default: dotnet pack --configuration Release --no-restore
+      dotnet_build_debug_command:
+        required: false
+        type: string
+        default: dotnet build -c Debug --no-restore
+      dotnet_build_release_command:
+        required: false
+        type: string
+        default: dotnet build -c Release --no-restore
 
 jobs:
   build:
@@ -97,18 +114,18 @@ jobs:
           }
 
       - name: Build Debug
-        run: dotnet build -c Debug --no-restore
+        run:  ${{ parameters.dotnet_build_debug_command }}
 
       - name: Build Release
         env:
           CERT_PASSWORD: "${{ secrets.code_sign_password }}"
-        run: dotnet build -c Release --no-restore
+        run: ${{ parameters.dotnet_build_release_command }}
 
       - name: Publish Release
-        run: dotnet publish --configuration Release --no-build --no-restore
+        run: ${{ parameters.dotnet_publish_command }}
 
       - name: Pack Release
-        run: dotnet pack --configuration Release --no-restore
+        run: ${{ parameters.dotnet_pack_command }}
 
       - name: Test Release
         timeout-minutes: 10
