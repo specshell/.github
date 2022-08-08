@@ -40,6 +40,10 @@ on:
         required: false
         type: string
         default: 'dotnet build -c Release --no-restore'
+      before_build:
+        default: ''
+        required: false
+        type: string
     secrets:
       package_user:
         required: true
@@ -111,6 +115,11 @@ jobs:
             echo "Installing osslsigncode"
             sudo apt-get install -qq -y osslsigncode
           }
+
+      - name: Before Build
+        if: inputs.before_build != ''
+        run: |
+          ${{ inputs.before_build }}
 
       - name: Build Debug
         run:  ${{ inputs.dotnet_build_debug_command }}
