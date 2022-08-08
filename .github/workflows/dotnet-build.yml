@@ -118,10 +118,9 @@ jobs:
 
       - name: Before Build
         env:
-          JOB_CONTEXT: ${{ toJson(job) }}
+          JOB_CONTEXT: ${{ toJson(github) }}
         if: inputs.before_build != ''
-        run: |
-          ${{ inputs.before_build }}
+        run: ${{ inputs.before_build }}
 
       - name: Build Debug
         run:  ${{ inputs.dotnet_build_debug_command }}
