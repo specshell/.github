@@ -44,6 +44,10 @@ on:
         default: ''
         required: false
         type: string
+      generic_env_variables:
+        default: ''
+        required: false
+        type: string
     secrets:
       package_user:
         required: true
@@ -116,9 +120,11 @@ jobs:
             sudo apt-get install -qq -y osslsigncode
           }
 
+      - name: Setup Generic Env Variables
+        if: inputs.generic_env_variables != ''
+        run: ${{ inputs.generic_env_variables }} >> $GITHUB_ENV
+
       - name: Before Build
-        env:
-          JOB_CONTEXT: ${{ toJson(github) }}
         if: inputs.before_build != ''
         run: ${{ inputs.before_build }}
 
