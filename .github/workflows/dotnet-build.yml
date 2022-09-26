@@ -44,6 +44,10 @@ on:
         default: ''
         required: false
         type: string
+      dotnet-version: 
+        required: false
+        type: string
+        default: '6.0.x'   
     secrets:
       package_user:
         required: true
@@ -97,7 +101,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v2.1.0
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: ${{inputs.dotnet-version}}
 
       - name: Restore dependencies
         run: |
