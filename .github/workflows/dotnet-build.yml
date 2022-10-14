@@ -99,7 +99,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v2.1.0
+        uses: actions/setup-dotnet@v3.0.2
         with:
           dotnet-version: ${{inputs.dotnet-version}}
 
