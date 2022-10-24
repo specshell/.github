@@ -16,6 +16,10 @@ on:
         default: '.'
         required: false
         type: string
+      image_file:
+        default: '${{inputs.image_context}}/Dockerfile'
+        required: false
+        type: string
       before_build:
         default: ''
         required: false
@@ -91,6 +95,7 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           context: ${{ inputs.image_context }}
+          file: ${{inputs.image_file}}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
