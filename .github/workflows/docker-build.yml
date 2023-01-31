@@ -81,7 +81,7 @@ jobs:
           ${{ inputs.before_build }}
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
           build-args: |
